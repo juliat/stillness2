@@ -24,7 +24,8 @@ ToxiclibsSupport gfx;
 PolygonBlob poly;
 
 // PImage to hold incoming imagery and smaller one for blob detection
-PImage cam, blobs;
+PImage cam;
+PImage blobs;
 // the kinect's dimensions to be used later on for calculations
 int kinectWidth = 640;
 int kinectHeight = 480;
@@ -48,7 +49,7 @@ ArrayList<CustomShape> polygons = new ArrayList<CustomShape>();
 
 void setup() {
   // it's possible to customize this, for example 1920x1080
-  size(1280, 720, OPENGL);
+  size(640,480, OPENGL);
   context = new SimpleOpenNI(this);
   // initialize SimpleOpenNI object
   if (context.isInit() == false)
@@ -87,7 +88,9 @@ void draw() {
   // update the SimpleOpenNI object
   context.update();
   // put the image into a PImage
-  cam = image(context.userImage(),0,0);
+  cam = context.userImage().get();
+  // display the image
+  image(cam, 0, 0);
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
@@ -157,7 +160,7 @@ void setRandomColors(int nthFrame) {
     // set background color to first color from palette
     bgColor = colorPalette[0];
     // set blob color to second color from palette
-    blobColor = colorPalette[1];
+    blobColor = color(255, 0, 0); //colorPalette[1];
     // set all shape colors randomly
     for (CustomShape cs: polygons) { 
       cs.col = getRandomColor();
