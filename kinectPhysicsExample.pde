@@ -29,8 +29,8 @@ PolygonBlob poly;
 PImage cam;
 PImage blobs;
 // the kinect's dimensions to be used later on for calculations
-int kinectWidth = 640;
-int kinectHeight = 480;
+int kinectWidth;
+int kinectHeight;
 // to center and rescale from 640x480 to higher custom resolutions
 float reScale;
 
@@ -50,8 +50,12 @@ PBox2D box2d;
 ArrayList<CustomShape> polygons = new ArrayList<CustomShape>();
 
 void setup() {
+  int wWidth = 640;
+  int wHeight = 320;
+  kinectWidth = wWidth;
+  kinectHeight = wHeight;
   // it's possible to customize this, for example 1920x1080
-  size(640,480, OPENGL);
+  size(wWidth, wHeight, OPENGL);
   context = new SimpleOpenNI(this);
   // initialize SimpleOpenNI object
   if (context.isInit() == false)
@@ -92,7 +96,7 @@ void draw() {
   // put the image into a PImage
   cam = context.userImage().get();
   // display the image
-  image(cam, 0, 0);
+  // image(cam, 0, 0);
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
@@ -103,6 +107,7 @@ void draw() {
   
   PImage blobsCamSize =  createImage(cam.width, cam.height, RGB);
   blobsCamSize.copy(blobs, 0, 0, blobs.width, blobs.height, 0, 0, blobsCamSize.width, blobsCamSize.height);
+  
   // image(blobsCamSize,0,0);
   
   // detect the blobs
@@ -114,7 +119,7 @@ void draw() {
   // create the box2d body from the polygon
   poly.createBody();
   // update and draw everything (see method)
- // updateAndDrawBox2D();
+  updateAndDrawBox2D();
   // destroy the person's body (important!)
   poly.destroyBody();
   // set the colors randomly every 240th frame
@@ -168,9 +173,9 @@ void setRandomColors(int nthFrame) {
       colorPalette[i] = int(paletteStrings[i]);
     }
     // set background color to first color from palette
-    bgColor = color(0, 255, 0);
+    bgColor = color(255);//colorPalette[0];
     // set blob color to second color from palette
-    blobColor = color(255, 0, 0); //colorPalette[1];
+    blobColor = color(0, 0, 255);//colorPalette[1];
     // set all shape colors randomly
     for (CustomShape cs: polygons) { 
       cs.col = getRandomColor();
