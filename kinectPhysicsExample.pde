@@ -11,6 +11,8 @@ import org.jbox2d.collision.shapes.*; // jbox2d
 import org.jbox2d.common.*; // jbox2d
 import org.jbox2d.dynamics.*; // jbox2d
 
+import gab.opencv.*; // opencv
+
 import java.util.Collections;
 
 
@@ -95,6 +97,14 @@ void draw() {
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
   blobs.filter(BLUR, 1);
+  
+  // select only the blue pixels - person
+  blobs = grabBluePixels(blobs);
+  
+  PImage blobsCamSize =  createImage(cam.width, cam.height, RGB);
+  blobsCamSize.copy(blobs, 0, 0, blobs.width, blobs.height, 0, 0, blobsCamSize.width, blobsCamSize.height);
+  // image(blobsCamSize,0,0);
+  
   // detect the blobs
   theBlobDetection.computeBlobs(blobs.pixels);
   // initialize a new polygon
@@ -104,7 +114,7 @@ void draw() {
   // create the box2d body from the polygon
   poly.createBody();
   // update and draw everything (see method)
-  updateAndDrawBox2D();
+ // updateAndDrawBox2D();
   // destroy the person's body (important!)
   poly.destroyBody();
   // set the colors randomly every 240th frame
@@ -129,7 +139,7 @@ void updateAndDrawBox2D() {
   fill(blobColor);
   gfx.polygon2D(poly);
 
-/*
+
   // display all the shapes (circles, polygons)
   // go backwards to allow removal of shapes
   for (int i=polygons.size()-1; i>=0; i--) {
@@ -144,7 +154,7 @@ void updateAndDrawBox2D() {
       cs.display();
     }
   }
-  */
+  
 }
 
 // sets the colors every nth frame
@@ -158,7 +168,7 @@ void setRandomColors(int nthFrame) {
       colorPalette[i] = int(paletteStrings[i]);
     }
     // set background color to first color from palette
-    bgColor = colorPalette[0];
+    bgColor = color(0, 255, 0);
     // set blob color to second color from palette
     blobColor = color(255, 0, 0); //colorPalette[1];
     // set all shape colors randomly
@@ -171,5 +181,29 @@ void setRandomColors(int nthFrame) {
 // returns a random color from the palette (excluding first aka background color)
 color getRandomColor() {
   return colorPalette[int(random(1, colorPalette.length))];
+}
+
+PImage grabBluePixels(PImage source){
+  PImage destination = createImage(source.width, source.height, RGB);
+  // We are going to look at both image's pixels
+  source.loadPixels();
+  destination.loadPixels();
+  
+  for (int x = 0; x < source.width; x++) {
+    for (int y = 0; y < source.height; y++ ) {
+      int loc = x + y*source.width;
+      // Check for non-grey
+      if (blue(source.pixels[loc]) != red(source.pixels[loc])) {
+        destination.pixels[loc]  = color(0);  // Blk
+      }  else {
+        destination.pixels[loc]  = color(255);    // White
+      }
+    }
+  }
+
+  // We changed the pixels in destination
+  destination.updatePixels(); 
+  
+  return destination;
 }
 
