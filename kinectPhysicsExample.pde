@@ -11,6 +11,9 @@ import org.jbox2d.collision.shapes.*; // jbox2d
 import org.jbox2d.common.*; // jbox2d
 import org.jbox2d.dynamics.*; // jbox2d
 
+import java.util.Collections;
+
+
 // declare SimpleOpenNI object
 SimpleOpenNI context;
 // declare BlobDetection object
@@ -48,33 +51,35 @@ void setup() {
   size(1280, 720, OPENGL);
   context = new SimpleOpenNI(this);
   // initialize SimpleOpenNI object
-  if (!context.enableScene()) { 
-    // if context.enableScene() returns false
-    // then the Kinect is not working correctly
-    // make sure the green light is blinking
-    println("Kinect not connected!"); 
+  if (context.isInit() == false)
+  {
+    println("Can't init SimpleOpenNI, maybe the camera is not connected!"); 
     exit();
-  } else {
-    // mirror the image to be more intuitive
-    context.setMirror(true);
-    // calculate the reScale value
-    // currently it's rescaled to fill the complete width (cuts of top-bottom)
-    // it's also possible to fill the complete height (leaves empty sides)
-    reScale = (float) width / kinectWidth;
-    // create a smaller blob image for speed and efficiency
-    blobs = createImage(kinectWidth/3, kinectHeight/3, RGB);
-    // initialize blob detection object to the blob image dimensions
-    theBlobDetection = new BlobDetection(blobs.width, blobs.height);
-    theBlobDetection.setThreshold(0.2);
-    // initialize ToxiclibsSupport object
-    gfx = new ToxiclibsSupport(this);
-    // setup box2d, create world, set gravity
-    box2d = new PBox2D(this);
-    box2d.createWorld();
-    box2d.setGravity(0, -20);
-    // set random colors (background, blob)
-    setRandomColors(1);
+    return;
   }
+
+  // enable depthMap generation 
+  context.enableDepth();
+
+  // enable skeleton generation for all joints
+  context.enableUser();
+  // calculate the reScale value
+  // currently it's rescaled to fill the complete width (cuts of top-bottom)
+  // it's also possible to fill the complete height (leaves empty sides)
+  reScale = (float) width / kinectWidth;
+  // create a smaller blob image for speed and efficiency
+  blobs = createImage(kinectWidth/3, kinectHeight/3, RGB);
+  // initialize blob detection object to the blob image dimensions
+  theBlobDetection = new BlobDetection(blobs.width, blobs.height);
+  theBlobDetection.setThreshold(0.2);
+  // initialize ToxiclibsSupport object
+  gfx = new ToxiclibsSupport(this);
+  // setup box2d, create world, set gravity
+  box2d = new PBox2D(this);
+  box2d.createWorld();
+  box2d.setGravity(0, -20);
+  // set random colors (background, blob)
+  setRandomColors(1);
 }
 
 void draw() {
@@ -82,7 +87,7 @@ void draw() {
   // update the SimpleOpenNI object
   context.update();
   // put the image into a PImage
-  cam = context.sceneImage().get();
+  cam = image(context.userImage(),0,0);
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
@@ -121,6 +126,7 @@ void updateAndDrawBox2D() {
   fill(blobColor);
   gfx.polygon2D(poly);
 
+/*
   // display all the shapes (circles, polygons)
   // go backwards to allow removal of shapes
   for (int i=polygons.size()-1; i>=0; i--) {
@@ -128,12 +134,14 @@ void updateAndDrawBox2D() {
     // if the shape is off-screen remove it (see class for more info)
     if (cs.done()) {
       polygons.remove(i);
-    // otherwise update (keep shape outside person) and display (circle or polygon)
-    } else {
+      // otherwise update (keep shape outside person) and display (circle or polygon)
+    } 
+    else {
       cs.update();
       cs.display();
     }
   }
+  */
 }
 
 // sets the colors every nth frame
@@ -151,7 +159,9 @@ void setRandomColors(int nthFrame) {
     // set blob color to second color from palette
     blobColor = colorPalette[1];
     // set all shape colors randomly
-    for (CustomShape cs: polygons) { cs.col = getRandomColor(); }
+    for (CustomShape cs: polygons) { 
+      cs.col = getRandomColor();
+    }
   }
 }
 
@@ -159,3 +169,4 @@ void setRandomColors(int nthFrame) {
 color getRandomColor() {
   return colorPalette[int(random(1, colorPalette.length))];
 }
+
