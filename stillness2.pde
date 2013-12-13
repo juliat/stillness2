@@ -109,6 +109,11 @@ void draw() {
     {
       context.convertRealWorldToProjective(com,com2d);
       // this will break with more than one person right now
+      
+       // this will track motion
+       // only track if kinect isn't freaking out, though
+       person.update();
+      
     }
   }    
   
@@ -116,9 +121,6 @@ void draw() {
   cam = context.userImage().get();
   // display the image
   // image(cam, 0, 0);
-  
-  // this will track motion
-  person.update();
   
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);

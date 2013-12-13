@@ -1,9 +1,6 @@
 // the thing or individual which is moving, to which the butterflies react
 // largely tracks motion
 class Person {
-  float currentVelocity = 0;
-  float averageVelocity = 0;
-  float cumulativeVelocity = 0;
 
   int startStillnessTime = 0;
   int stillnessDuration = 0;
@@ -18,23 +15,21 @@ class Person {
   void update() {
     timeBetweenSamples = millis() - timePositionWasLastSampled;
     timePositionWasLastSampled = millis();
-    captureVelocity();
-    updateAverageVelocity();
+    captureMotion();
+    printDebug();
   }
   // get the difference between the last position recorded
   // and this one to figure out velocity
-  void captureVelocity() {
+  void captureMotion() {
     float distance = dist(com.x, com.y, lastCOM.x, lastCOM.y);
     println("com x " + com.x + "com y " + com.y);
     println("last com x " + lastCOM.x + " last com y " + lastCOM.y);
     println("distance " + distance);
     float velocity = distance/timeBetweenSamples;
-    cumulativeVelocity += velocity;
-    numVelocitiesCaptured++;
-    currentVelocity = velocity;
 
-    // if not moving
-    if (velocity == 0.0) {
+    // if not movin
+    float jitterThreshold = 3;
+    if (distance < jitterThreshold) {
       // and was moving before
       if (stillnessDuration < 1) {
         // record time
@@ -57,12 +52,18 @@ class Person {
     }
     lastCOM = new PVector(com.x, com.y);
   }
-
-  void updateAverageVelocity() {
-    float newAverage = cumulativeVelocity / numVelocitiesCaptured;
-    println("new average " + newAverage);
-    averageVelocity = newAverage;
+  
+  void printDebug() {
+    println("Time Position was Last Sampled " + timePositionWasLastSampled);
+    println("Time Between Samples " + timeBetweenSamples);
+   
+    println("Stillness Duration " + stillnessDuration);
+    println("Start Stillness Time " + startStillnessTime);
+    
+    // println("Number of Butterflies Attracted " + numButterfliesAttracted);
+    // println("Num Bs and Stillness Thresh " + (numButterfliesAttracted*stillnessThreshold));
   }
+
 } // end person class 
 
 
