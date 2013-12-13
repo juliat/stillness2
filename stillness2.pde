@@ -38,7 +38,7 @@ float reScale;
 Person person = new Person();
 
 PVector com = new PVector();   
-PVector lastCOM = new PVector(0,0);
+PVector lastCOM = new PVector(0, 0);
 PVector com2d = new PVector();                                   
 
 // background and blob color
@@ -55,6 +55,10 @@ color[] colorPalette;
 PBox2D box2d;
 // list to hold all the custom shapes (circles, polygons)
 ArrayList<CustomShape> polygons = new ArrayList<CustomShape>();
+
+int numFrames = 0;
+boolean applyWind = false;
+int attractToPerson = -1; // -1 = repel, 1 = attract, 0 = neutral
 
 void setup() {
   int wWidth = 640;
@@ -90,7 +94,7 @@ void setup() {
   // setup box2d, create world, set gravity
   box2d = new PBox2D(this);
   box2d.createWorld();
-  box2d.setGravity(0, -20);
+  box2d.setGravity(0, 0);
   // set random colors (background, blob)
   setRandomColors(1);
 }
@@ -99,37 +103,38 @@ void draw() {
   background(bgColor);
   // update the SimpleOpenNI object
   context.update();
-  
+
   // get the users center of mass if it's available
+  attractToPerson = 0; // neutral by default for when kinect is janky
   int[] userList = context.getUsers();
-  for(int i=0;i<userList.length;i++)
+  for (int i=0;i<userList.length;i++)
   {
     // store the center of mass
-    if(context.getCoM(userList[i],com))
+    if (context.getCoM(userList[i], com))
     {
-      context.convertRealWorldToProjective(com,com2d);
+      context.convertRealWorldToProjective(com, com2d);
       // this will break with more than one person right now
-      
-       // this will track motion
-       // only track if kinect isn't freaking out, though
-       person.update();
-      
+
+      // this will track motion
+      // only track if kinect isn't freaking out, though
+      person.update();
     }
-  }    
+  } 
+     
   
   // put the image into a PImage
   cam = context.userImage().get();
   // display the image
   // image(cam, 0, 0);
-  
+
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
   blobs.filter(BLUR, 1);
-  
+
   // select only the blue pixels - person
   blobs = grabBluePixels(blobs);  
-  
+
   // detect the blobs
   theBlobDetection.computeBlobs(blobs.pixels);
   // initialize a new polygon
@@ -144,14 +149,22 @@ void draw() {
   poly.destroyBody();
   // set the colors randomly every 240th frame
   // setRandomColors(240);
+  numFrames++;
 }
 
 void updateAndDrawBox2D() {
-  // if frameRate is sufficient, add a polygon and a circle with a random radius
+  // if frameRate is sufficient, add a circle
   if (frameRate > 29) {
-    polygons.add(new CustomShape(kinectWidth/2, -50, -1));
-    polygons.add(new CustomShape(kinectWidth/2, -50, random(2.5, 20)));
+    float randomX = random(0, kinectWidth);
+    float randomY = random(0, kinectHeight);
+    polygons.add(new CustomShape(randomX, randomY, 5));
   }
+  
+  // update stuff for shapes
+  if (numFrames%2 == 0) {
+    applyWind = !applyWind;
+  }
+  
   // take one step in the box2d physics world
   box2d.step();
 
@@ -179,7 +192,6 @@ void updateAndDrawBox2D() {
       cs.display();
     }
   }
-  
 }
 
 // sets the colors every nth frame
@@ -208,19 +220,20 @@ color getRandomColor() {
   return colorPalette[int(random(1, colorPalette.length))];
 }
 
-PImage grabBluePixels(PImage source){
+PImage grabBluePixels(PImage source) {
   PImage destination = createImage(source.width, source.height, RGB);
   // We are going to look at both image's pixels
   source.loadPixels();
   destination.loadPixels();
-  
+
   for (int x = 0; x < source.width; x++) {
     for (int y = 0; y < source.height; y++ ) {
       int loc = x + y*source.width;
       // Check for non-grey
       if (blue(source.pixels[loc]) != red(source.pixels[loc])) {
         destination.pixels[loc]  = color(0);  // Blk
-      }  else {
+      }  
+      else {
         destination.pixels[loc]  = color(255);    // White
       }
     }
@@ -228,7 +241,7 @@ PImage grabBluePixels(PImage source){
 
   // We changed the pixels in destination
   destination.updatePixels(); 
-  
+
   return destination;
 }
 

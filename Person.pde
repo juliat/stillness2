@@ -35,8 +35,7 @@ class Person {
         // record time
         startStillnessTime = millis();
         stillnessDuration = 1;
-        //  attractButterflies();
-        // wasn't moving before
+        attractToPerson = 1;
       } 
       else {
         // update time since last motion
@@ -47,8 +46,7 @@ class Person {
     else {
       // reset stillness time
       stillnessDuration = 0;
-      // and numButterfliesAttracted
-      numButterfliesAttracted = 0;
+      attractToPerson = -1;
     }
     lastCOM = new PVector(com.x, com.y);
   }
