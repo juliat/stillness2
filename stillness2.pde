@@ -1,4 +1,5 @@
-// Kinect Physics Example by Amnon Owed (15/09/12)
+// Butterflies by Julia Teitelbaum (12/13/2013)
+// Based on Kinect Physics Example by Amnon Owed (09/15/2012)
 
 // import libraries
 import processing.opengl.*; // opengl
@@ -10,9 +11,7 @@ import pbox2d.*; // shiffman's jbox2d helper library
 import org.jbox2d.collision.shapes.*; // jbox2d
 import org.jbox2d.common.*; // jbox2d
 import org.jbox2d.dynamics.*; // jbox2d
-
 import gab.opencv.*; // opencv
-
 import java.util.Collections;
 
 
