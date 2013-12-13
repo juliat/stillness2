@@ -28,11 +28,16 @@ PolygonBlob poly;
 // PImage to hold incoming imagery and smaller one for blob detection
 PImage cam;
 PImage blobs;
+
 // the kinect's dimensions to be used later on for calculations
 int kinectWidth;
 int kinectHeight;
 // to center and rescale from 640x480 to higher custom resolutions
 float reScale;
+
+PVector com = new PVector();   
+PVector lastCOM = new PVector();
+PVector com2d = new PVector();                                   
 
 // background and blob color
 color bgColor, blobColor;
@@ -64,7 +69,6 @@ void setup() {
     exit();
     return;
   }
-
   // enable depthMap generation 
   context.enableDepth();
 
@@ -93,22 +97,44 @@ void draw() {
   background(bgColor);
   // update the SimpleOpenNI object
   context.update();
+  
+  // get the users center of mass if it's available
+  int[] userList = context.getUsers();
+  for(int i=0;i<userList.length;i++)
+  {
+    // draw the center of mass
+    if(context.getCoM(userList[i],com))
+    {
+      context.convertRealWorldToProjective(com,com2d);
+      
+      stroke(100,255,0);
+      strokeWeight(1);
+      beginShape(LINES);
+        vertex(com2d.x,com2d.y - 5);
+        vertex(com2d.x,com2d.y + 5);
+
+        vertex(com2d.x - 5,com2d.y);
+        vertex(com2d.x + 5,com2d.y);
+      endShape();
+      
+      fill(0,255,100);
+      text(Integer.toString(userList[i]),com2d.x,com2d.y);
+      lastCOM = com; // save last center of mass so we can use it for velocity tracking
+    }
+  }    
+  
   // put the image into a PImage
   cam = context.userImage().get();
   // display the image
   // image(cam, 0, 0);
+  
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
   // blur the blob image
   blobs.filter(BLUR, 1);
   
   // select only the blue pixels - person
-  blobs = grabBluePixels(blobs);
-  
-  PImage blobsCamSize =  createImage(cam.width, cam.height, RGB);
-  blobsCamSize.copy(blobs, 0, 0, blobs.width, blobs.height, 0, 0, blobsCamSize.width, blobsCamSize.height);
-  
-  // image(blobsCamSize,0,0);
+  blobs = grabBluePixels(blobs);  
   
   // detect the blobs
   theBlobDetection.computeBlobs(blobs.pixels);
@@ -123,7 +149,7 @@ void draw() {
   // destroy the person's body (important!)
   poly.destroyBody();
   // set the colors randomly every 240th frame
-  setRandomColors(240);
+  // setRandomColors(240);
 }
 
 void updateAndDrawBox2D() {
