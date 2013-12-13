@@ -116,18 +116,18 @@ class CustomShape {
     // get the pixel coordinates of the body
     Vec2 pos = box2d.getBodyPixelCoord(body);
     float a = body.getAngle();
-    pushMatrix();
+    offscreen.pushMatrix();
     // translate to the position
-    translate(pos.x, pos.y);
-    rotate(-a);
-    noStroke();
+    offscreen.translate(pos.x, pos.y);
+    offscreen.rotate(-a);
+    offscreen.noStroke();
     // use the shape's custom color
-    fill(col);
-    ellipse(0, 0, r*2, r*2);
-    ellipse(0, wingDistance, r*2, r*2);
-    ellipse(wingDistance, 0, r*2, r*2);
-    ellipse(wingDistance, wingDistance, r*2, r*2);
-    popMatrix();
+    offscreen.fill(col);
+    offscreen.ellipse(0, 0, r*2, r*2);
+    offscreen.ellipse(0, wingDistance, r*2, r*2);
+    offscreen.ellipse(wingDistance, 0, r*2, r*2);
+    offscreen.ellipse(wingDistance, wingDistance, r*2, r*2);
+    offscreen.popMatrix();
   }
 
   // if the shape moves off-screen, destroy the box2d body (important!)

@@ -14,7 +14,13 @@ import org.jbox2d.dynamics.*; // jbox2d
 import gab.opencv.*; // opencv
 
 import java.util.Collections;
-
+import deadpixel.keystone.*; // for projecting
+ 
+Keystone ks;
+PGraphics offscreen;
+CornerPinSurface surface;
+int offscreenW = 480; 
+int offscreenH = 360; 
 
 // declare SimpleOpenNI object
 SimpleOpenNI context;
@@ -64,6 +70,13 @@ boolean applyWind = false;
 int attractToPerson = 0; // -1 = repel, 1 = attract, 0 = neutral
 
 void setup() {
+  
+  // Initialize the Keystone offscreen buffer etc. 
+  size(640, 480, P3D);
+  ks = new Keystone(this);
+  surface = ks.createCornerPinSurface(offscreenW, offscreenH, 20);
+  offscreen = createGraphics(offscreenW, offscreenH, P3D);
+  
   int wWidth = 640;
   int wHeight = 480;
   kinectWidth = wWidth;
@@ -175,12 +188,12 @@ void updateAndDrawBox2D() {
   box2d.step();
 
   // center and reScale from Kinect to custom dimensions
-  translate(0, (height-kinectHeight*reScale)/2);
-  scale(reScale);
+  offscreen.translate(0, (height-kinectHeight*reScale)/2);
+  offscreen.scale(reScale);
 
   // display the person's polygon  
-  noStroke();
-  fill(blobColor);
+  offscreen.noStroke();
+  offscreen.fill(blobColor);
   gfx.polygon2D(poly);
 
 
@@ -270,3 +283,6 @@ void createButterflies() {
   }
 }
 
+void keyPressed() {
+  ks.toggleCalibration();
+}
