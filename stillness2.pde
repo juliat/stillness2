@@ -35,8 +35,10 @@ int kinectHeight;
 // to center and rescale from 640x480 to higher custom resolutions
 float reScale;
 
+Person person = new Person();
+
 PVector com = new PVector();   
-PVector lastCOM = new PVector();
+PVector lastCOM = new PVector(0,0);
 PVector com2d = new PVector();                                   
 
 // background and blob color
@@ -102,24 +104,11 @@ void draw() {
   int[] userList = context.getUsers();
   for(int i=0;i<userList.length;i++)
   {
-    // draw the center of mass
+    // store the center of mass
     if(context.getCoM(userList[i],com))
     {
       context.convertRealWorldToProjective(com,com2d);
-      
-      stroke(100,255,0);
-      strokeWeight(1);
-      beginShape(LINES);
-        vertex(com2d.x,com2d.y - 5);
-        vertex(com2d.x,com2d.y + 5);
-
-        vertex(com2d.x - 5,com2d.y);
-        vertex(com2d.x + 5,com2d.y);
-      endShape();
-      
-      fill(0,255,100);
-      text(Integer.toString(userList[i]),com2d.x,com2d.y);
-      lastCOM = com; // save last center of mass so we can use it for velocity tracking
+      // this will break with more than one person right now
     }
   }    
   
@@ -127,6 +116,9 @@ void draw() {
   cam = context.userImage().get();
   // display the image
   // image(cam, 0, 0);
+  
+  // this will track motion
+  person.update();
   
   // copy the image into the smaller blob image
   blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
