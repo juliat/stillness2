@@ -28,7 +28,7 @@ class CustomShape {
     bd.type = BodyType.DYNAMIC;
     bd.position.set(box2d.coordPixelsToWorld(new Vec2(x, y)));
     body = box2d.createBody(bd);
-    body.setLinearVelocity(new Vec2(random(-3, 3), random(-10, 3)));
+    body.setLinearVelocity(new Vec2(random(-3, 3), random(-4, 3)));
     body.setAngularVelocity(random(-3, 3));
 
     // box2d circle shape of radius r

@@ -56,6 +56,8 @@ PBox2D box2d;
 // list to hold all the custom shapes (circles, polygons)
 ArrayList<CustomShape> polygons = new ArrayList<CustomShape>();
 
+ArrayList<Boundary> boundaries;
+
 int numFrames = 0;
 boolean applyWind = false;
 int attractToPerson = -1; // -1 = repel, 1 = attract, 0 = neutral
@@ -95,6 +97,8 @@ void setup() {
   box2d = new PBox2D(this);
   box2d.createWorld();
   box2d.setGravity(0, 0);
+  boundaries = new ArrayList<Boundary>();
+  createBoundaries();
   // set random colors (background, blob)
   setRandomColors(1);
 }
@@ -121,7 +125,6 @@ void draw() {
     }
   } 
      
-  
   // put the image into a PImage
   cam = context.userImage().get();
   // display the image
@@ -153,11 +156,10 @@ void draw() {
 }
 
 void updateAndDrawBox2D() {
-  // if frameRate is sufficient, add a circle
-  if (frameRate > 29) {
-    float randomX = random(0, kinectWidth);
-    float randomY = random(0, kinectHeight);
-    polygons.add(new CustomShape(randomX, randomY, 5));
+  
+  // if there are no butterflies, ake them
+  if ((polygons == null) || (polygons.size() < 1)) {
+    createButterflies();
   }
   
   // update stuff for shapes
@@ -178,19 +180,12 @@ void updateAndDrawBox2D() {
   gfx.polygon2D(poly);
 
 
-  // display all the shapes (circles, polygons)
+  // display all the circles/butterflies
   // go backwards to allow removal of shapes
   for (int i=polygons.size()-1; i>=0; i--) {
     CustomShape cs = polygons.get(i);
-    // if the shape is off-screen remove it (see class for more info)
-    if (cs.done()) {
-      polygons.remove(i);
-      // otherwise update (keep shape outside person) and display (circle or polygon)
-    } 
-    else {
-      cs.update();
-      cs.display();
-    }
+    cs.update();
+    cs.display();
   }
 }
 
@@ -245,3 +240,36 @@ PImage grabBluePixels(PImage source) {
   return destination;
 }
 
+
+void createBoundaries() {
+  int boundarySize = 2;
+  Boundary top = new Boundary(width/2, 0, width, boundarySize); // x, y, w, h relative to center
+  boundaries.add(top);
+  Boundary bottom = new Boundary(width/2, height, width, boundarySize);
+  boundaries.add(bottom);
+  Boundary left = new Boundary(0, height/2, boundarySize, height);
+  boundaries.add(left);
+  Boundary right = new Boundary(width, height/2, boundarySize, height);
+  boundaries.add(right);
+}
+void displayBoundaries() {
+  for (Boundary b: boundaries) {
+    b.display();
+  }
+}
+
+void createButterflies() {
+  int numButterflies = 15;
+  for (int i = 0; i < numButterflies; i++) {
+    float randomX = random(0, width);
+    float randomY = random(0, height);
+    polygons.add(new CustomShape(randomX, randomY, 5));
+  }
+}
+
+  // if frameRate is sufficient, add a circle
+  if (frameRate > 29) {
+    float randomX = random(0, kinectWidth);
+    float randomY = random(0, kinectHeight);
+    polygons.add(new CustomShape(randomX, randomY, 5));
+  }
