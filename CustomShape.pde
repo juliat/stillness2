@@ -29,19 +29,38 @@ class CustomShape {
     bd.position.set(box2d.coordPixelsToWorld(new Vec2(x, y)));
     body = box2d.createBody(bd);
     body.setLinearVelocity(new Vec2(random(-3, 3), random(-3, 3)));
-    body.setAngularVelocity(random(-3, 3));
+    body.setAngularVelocity(random(-1, 1));
 
-    // box2d circle shape of radius r
-    CircleShape cs = new CircleShape();
-    cs.m_radius = box2d.scalarPixelsToWorld(r);
-    // tweak the circle's fixture def a little bit
-    FixtureDef fd = new FixtureDef();
-    fd.shape = cs;
-    fd.density = 1;
-    fd.friction = 0.5;
-    fd.restitution = 0.5;
-    // create the fixture from the shape's fixture def (deflect things based on the actual circle shape)
-    body.createFixture(fd);
+    // attach 4 circles to make a butterflyish shape
+    int numWings = 4;
+    for (int i = 0 ; i < numWings; i++) {
+      // box2d circle shape of radius r
+      CircleShape cs = new CircleShape();
+      cs.m_radius = box2d.scalarPixelsToWorld(r);
+  
+  
+      Vec2 offset  = new Vec2(0, 0);
+
+      if (i == 1) {
+        offset = new Vec2(0, r);
+      } 
+      else if (i == 2) {
+        offset = new Vec2(r, 0);
+      } 
+      else if (i == 3) {
+        offset = new Vec2(r, r);
+      }
+      offset = box2d.vectorPixelsToWorld(offset);
+      cs.m_p.set(offset.x, offset.y);
+      // tweak the circle's fixture def a little bit
+      FixtureDef fd = new FixtureDef();
+      fd.shape = cs;
+      fd.density = 1;
+      fd.friction = 0.5;
+      fd.restitution = 0.5;
+      // create the fixture from the shape's fixture def (deflect things based on the actual circle shape)
+      body.createFixture(fd);
+    }
   }
 
   // method to loosely move shapes outside a person's polygon
@@ -52,13 +71,13 @@ class CustomShape {
     //println("attract " + attractToPerson);
     if (attractToPerson > 0) {
       attractToPoint(fakeCenter.x, fakeCenter.y);
-       //println("ATTRACT");
+      //println("ATTRACT");
     } 
     else if (attractToPerson < 0) {
       repelFromPoint(fakeCenter.x, fakeCenter.y);
       //println("REPEL");
     } 
-    
+
     if (applyWind) {
       applyWind();
     }
@@ -94,13 +113,18 @@ class CustomShape {
   void display() {
     // get the pixel coordinates of the body
     Vec2 pos = box2d.getBodyPixelCoord(body);
+    float a = body.getAngle();
     pushMatrix();
     // translate to the position
     translate(pos.x, pos.y);
+    rotate(-a);
     noStroke();
     // use the shape's custom color
     fill(col);
     ellipse(0, 0, r*2, r*2);
+    ellipse(0, r, r*2, r*2);
+    ellipse(r, 0, r*2, r*2);
+    ellipse(r, r, r*2, r*2);
     popMatrix();
   }
 

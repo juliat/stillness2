@@ -61,11 +61,11 @@ ArrayList<Boundary> boundaries;
 
 int numFrames = 0;
 boolean applyWind = false;
-int attractToPerson = -1; // -1 = repel, 1 = attract, 0 = neutral
+int attractToPerson = 0; // -1 = repel, 1 = attract, 0 = neutral
 
 void setup() {
   int wWidth = 640;
-  int wHeight = 320;
+  int wHeight = 480;
   kinectWidth = wWidth;
   kinectHeight = wHeight;
   // it's possible to customize this, for example 1920x1080
@@ -139,6 +139,11 @@ void draw() {
 
   // detect the blobs
   theBlobDetection.computeBlobs(blobs.pixels);
+  
+  if (theBlobDetection.getBlobNb() < 1) {
+    attractToPerson = 0;
+  }
+  
   // initialize a new polygon
   poly = new PolygonBlob();
   // create the polygon from the blobs (custom functionality, see class)
@@ -199,9 +204,9 @@ void setRandomColors(int nthFrame) {
       colorPalette[i] = int(paletteStrings[i]);
     }
     // set background color to first color from palette
-    bgColor = color(255);//colorPalette[0];
+    bgColor = colorPalette[0];
     // set blob color to second color from palette
-    blobColor = color(0, 0, 255);//colorPalette[1];
+    blobColor = colorPalette[1];
     // set all shape colors randomly
     for (CustomShape cs: polygons) { 
       cs.col = getRandomColor();

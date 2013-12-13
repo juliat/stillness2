@@ -35,12 +35,14 @@ class Person {
         // record time
         startStillnessTime = millis();
         stillnessDuration = 1;
-        attractToPerson = 1;
+        attractToPerson = 0;
       } 
       else {
         // update time since last motion
         stillnessDuration = millis() - startStillnessTime;
-        attractToPerson = 1;
+        if (stillnessDuration%2 == 0) {
+          attractToPerson = 1;
+        }
       }
     } 
     else {
