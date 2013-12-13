@@ -40,8 +40,8 @@ class Person {
       else {
         // update time since last motion
         stillnessDuration = millis() - startStillnessTime;
+        attractToPerson = 1;
       }
-      // moving
     } 
     else {
       // reset stillness time
@@ -51,13 +51,17 @@ class Person {
     lastCOM = new PVector(com.x, com.y);
   }
   
+  void drawCOM() {
+    ellipse(com.x, com.y, 5, 5);
+  }
+  
   void printDebug() {
     println("Time Position was Last Sampled " + timePositionWasLastSampled);
     println("Time Between Samples " + timeBetweenSamples);
    
     println("Stillness Duration " + stillnessDuration);
     println("Start Stillness Time " + startStillnessTime);
-    
+    println("attractToPerson " + attractToPerson);
     // println("Number of Butterflies Attracted " + numButterfliesAttracted);
     // println("Num Bs and Stillness Thresh " + (numButterfliesAttracted*stillnessThreshold));
   }

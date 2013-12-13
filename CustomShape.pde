@@ -28,7 +28,7 @@ class CustomShape {
     bd.type = BodyType.DYNAMIC;
     bd.position.set(box2d.coordPixelsToWorld(new Vec2(x, y)));
     body = box2d.createBody(bd);
-    body.setLinearVelocity(new Vec2(random(-3, 3), random(-4, 3)));
+    body.setLinearVelocity(new Vec2(random(-3, 3), random(-3, 3)));
     body.setAngularVelocity(random(-3, 3));
 
     // box2d circle shape of radius r
@@ -38,8 +38,8 @@ class CustomShape {
     FixtureDef fd = new FixtureDef();
     fd.shape = cs;
     fd.density = 1;
-    fd.friction = 0.01;
-    fd.restitution = 0.3;
+    fd.friction = 0.5;
+    fd.restitution = 0.5;
     // create the fixture from the shape's fixture def (deflect things based on the actual circle shape)
     body.createFixture(fd);
   }
@@ -49,11 +49,14 @@ class CustomShape {
   void update() {
     //if (person.stillnessDuration > (person.stillnessThreshold * person.numButterfliesAttracted)) {
 
+    //println("attract " + attractToPerson);
     if (attractToPerson > 0) {
-      attractToPoint(com.x, com.y);
+      attractToPoint(fakeCenter.x, fakeCenter.y);
+       //println("ATTRACT");
     } 
     else if (attractToPerson < 0) {
-      repelFromPoint(com.x, com.y);
+      repelFromPoint(fakeCenter.x, fakeCenter.y);
+      //println("REPEL");
     } 
     
     if (applyWind) {

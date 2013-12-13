@@ -102,6 +102,9 @@ class PolygonBlob extends Polygon2D {
       Vec2[] verts = new Vec2[getNumPoints()];
       for (int i=0; i<getNumPoints(); i++) {
         Vec2D v = vertices.get(i);
+        if (i == round(getNumPoints()/2)) {
+          fakeCenter = new PVector(v.x, v.y);
+        }
         verts[i] = box2d.coordPixelsToWorld(v.x, v.y);
       }
       // create a chain from the array of vertices

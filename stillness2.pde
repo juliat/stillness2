@@ -40,6 +40,7 @@ Person person = new Person();
 PVector com = new PVector();   
 PVector lastCOM = new PVector(0, 0);
 PVector com2d = new PVector();                                   
+PVector fakeCenter = new PVector(0,0);
 
 // background and blob color
 color bgColor, blobColor;
@@ -109,19 +110,17 @@ void draw() {
   context.update();
 
   // get the users center of mass if it's available
-  attractToPerson = 0; // neutral by default for when kinect is janky
+  // attractToPerson = 0; // neutral by default for when kinect is janky
   int[] userList = context.getUsers();
   for (int i=0;i<userList.length;i++)
   {
     // store the center of mass
-    if (context.getCoM(userList[i], com))
-    {
+    if (context.getCoM(userList[i], com)) {
       context.convertRealWorldToProjective(com, com2d);
-      // this will break with more than one person right now
-
-      // this will track motion
-      // only track if kinect isn't freaking out, though
       person.update();
+    } 
+    else {
+      attractToPerson = 0;
     }
   } 
      
@@ -163,9 +162,9 @@ void updateAndDrawBox2D() {
   }
   
   // update stuff for shapes
-  if (numFrames%2 == 0) {
+  /*if (numFrames%2 == 0) {
     applyWind = !applyWind;
-  }
+  }*/
   
   // take one step in the box2d physics world
   box2d.step();
@@ -240,7 +239,6 @@ PImage grabBluePixels(PImage source) {
   return destination;
 }
 
-
 void createBoundaries() {
   int boundarySize = 2;
   Boundary top = new Boundary(width/2, 0, width, boundarySize); // x, y, w, h relative to center
@@ -267,9 +265,3 @@ void createButterflies() {
   }
 }
 
-  // if frameRate is sufficient, add a circle
-  if (frameRate > 29) {
-    float randomX = random(0, kinectWidth);
-    float randomY = random(0, kinectHeight);
-    polygons.add(new CustomShape(randomX, randomY, 5));
-  }
