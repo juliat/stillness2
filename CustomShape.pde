@@ -10,11 +10,13 @@ class CustomShape {
   color col;
   // radius (also used to distinguish between circles and polygons in this combi-class
   float r;
+  float wingDistance;
 
   boolean windDirection = true;
 
   CustomShape(float x, float y, float r) {
     this.r = r;
+    this.wingDistance = r*1.25;
     // create a body (polygon or circle based on the r)
     makeBody(x, y);
     // get a random color
@@ -42,13 +44,13 @@ class CustomShape {
       Vec2 offset  = new Vec2(0, 0);
 
       if (i == 1) {
-        offset = new Vec2(0, r);
+        offset = new Vec2(0, wingDistance);
       } 
       else if (i == 2) {
-        offset = new Vec2(r, 0);
+        offset = new Vec2(wingDistance, 0);
       } 
       else if (i == 3) {
-        offset = new Vec2(r, r);
+        offset = new Vec2(wingDistance, wingDistance);
       }
       offset = box2d.vectorPixelsToWorld(offset);
       cs.m_p.set(offset.x, offset.y);
@@ -122,9 +124,9 @@ class CustomShape {
     // use the shape's custom color
     fill(col);
     ellipse(0, 0, r*2, r*2);
-    ellipse(0, r, r*2, r*2);
-    ellipse(r, 0, r*2, r*2);
-    ellipse(r, r, r*2, r*2);
+    ellipse(0, wingDistance, r*2, r*2);
+    ellipse(wingDistance, 0, r*2, r*2);
+    ellipse(wingDistance, wingDistance, r*2, r*2);
     popMatrix();
   }
 

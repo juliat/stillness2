@@ -40,7 +40,7 @@ class Person {
       else {
         // update time since last motion
         stillnessDuration = millis() - startStillnessTime;
-        if (stillnessDuration%2 == 0) {
+        if (stillnessDuration > 1000) {
           attractToPerson = 1;
         }
       }
